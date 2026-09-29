@@ -1,0 +1,54 @@
+{
+  "name": "playwright-ai-framework",
+  "version": "1.0.0",
+  "description": "AI-powered self-healing Playwright framework: write requirements → AI generates tests → tests self-heal on failure",
+  "main": "index.js",
+  "bin": {
+    "pfqa": "./pfqa"
+  },
+  "scripts": {
+    "postinstall": "npx playwright install chromium && bash scripts/install-shell-commands.sh && printf '\\n\\033[1;32m✓ Setup complete!\\033[0m\\n\\nActivate now (one time):\\n\\n  source ~/.zshrc\\n\\nThen from any terminal:\\n  pfqa run login tests\\n  pfqa list all tests\\n  run login tests headed\\n'",
+
+    "run":         "tsx scripts/run.ts",
+    "test":           "playwright test",
+    "test:headed":    "cross-env PW_HEADED=1 playwright test",
+    "qa":             "cross-env test_env=qa   PW_HEADLESS=1 playwright test",
+    "staging":        "cross-env test_env=staging PW_HEADLESS=1 playwright test",
+    "install:shell":  "bash scripts/install-shell-commands.sh",
+
+    "studio":      "npx tsx scripts/studio.ts",
+    "record":      "tsx scripts/record-to-md.ts",
+    "record:md":   "tsx scripts/record-to-md.ts",
+    "record:spec": "tsx scripts/record-to-spec.ts",
+    "generate":    "tsx scripts/flow.ts",
+    "flow":        "tsx scripts/flow.ts",
+    "heal":        "tsx scripts/heal.ts",
+    "heal:all":    "tsx scripts/heal.ts --all",
+    "repair":      "tsx scripts/repair.ts",
+    "analyze":     "tsx scripts/analyze.ts",
+
+    "report":          "npm run report:share",
+    "report:generate": "JAVA_TOOL_OPTIONS='-Xmx16g' npx allure-commandline generate allure-results --clean -o allure-report",
+    "report:open":     "npx http-server allure-report -p 9323 -o /index.html -c-1 --silent",
+    "report:share":    "node -e \"const fs=require('fs'),path=require('path'),d='allure-results';fs.readdirSync(d).filter(f=>f.endsWith('-attachment')||f.match(/\\.(webm|zip)$/)).forEach(f=>fs.unlinkSync(path.join(d,f)));\" && JAVA_TOOL_OPTIONS='-Xmx16g' npx allure-commandline generate --single-file allure-results --clean -o allure-report-share && echo 'Share: allure-report-share/index.html'",
+    "report:clean":    "rm -rf allure-report allure-report-share allure-results"
+  },
+  "keywords": ["playwright", "ai", "self-healing", "test-automation", "page-object-model"],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "@anthropic-ai/sdk":             "^0.115.0",
+    "@modelcontextprotocol/sdk":     "^1.27.1",
+    "dotenv":                        "^17.4.2",
+    "playwright":                    "^1.58.2"
+  },
+  "devDependencies": {
+    "@playwright/test":  "^1.58.2",
+    "@types/node":       "^25.5.0",
+    "allure-commandline":"^2.38.1",
+    "allure-playwright": "^3.2.2",
+    "cross-env":         "^7.0.3",
+    "tsx":               "^4.23.5",
+    "typescript":        "^7.0.2"
+  }
+}

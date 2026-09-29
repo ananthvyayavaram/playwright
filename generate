@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# generate — Build and open a shareable Allure report.
+#
+# Usage:
+#   ./generate             # build report → allure-report-share/index.html
+#   ./generate open        # build + open in browser
+
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}"
+
+ALLURE_RESULTS="allure-results"
+ALLURE_REPORT="allure-report"
+ALLURE_SHARE="allure-report-share"
+
+if [[ ! -d "${ALLURE_RESULTS}" ]] || [[ -z "$(ls -A "${ALLURE_RESULTS}" 2>/dev/null)" ]]; then
+  echo ""
+  echo "  No allure-results found. Run your tests first:"
+  echo "    pfqa \"run login tests\""
+  echo ""
+  exit 1
+fi
+
+echo ""
+echo "  Generating Allure report…"
+npx allure generate "${ALLURE_RESULTS}" --output "${ALLURE_REPORT}" --clean --single-file -q 2>/dev/null || \
+npx allure generate "${ALLURE_RESULTS}" --output "${ALLURE_REPORT}" --clean -q
+
+# Copy single-file report for easy sharing
+if [[ -f "${ALLURE_REPORT}/index.html" ]]; then
+  mkdir -p "${ALLURE_SHARE}"
+  cp "${ALLURE_REPORT}/index.html" "${ALLURE_SHARE}/index.html"
+  echo "  Report: ${ALLURE_SHARE}/index.html"
+else
+  echo "  Report: ${ALLURE_REPORT}/index.html"
+fi
+echo ""
+
+if [[ "${1:-}" == "open" ]]; then
+  TARGET="${ALLURE_SHARE}/index.html"
+  [[ -f "${TARGET}" ]] || TARGET="${ALLURE_REPORT}/index.html"
+  if command -v open &>/dev/null; then
+    open "${TARGET}"
+  elif command -v xdg-open &>/dev/null; then
+    xdg-open "${TARGET}"
+  else
+    echo "  Open manually: ${TARGET}"
+  fi
+fi

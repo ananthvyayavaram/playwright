@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# pfqa — Playwright Framework QA runner
+# Natural language entry point for all test operations.
+#
+# Usage (no quotes required):
+#   pfqa run login tests
+#   pfqa run all tests headed
+#   pfqa run login tests on staging
+#   pfqa analyze failures
+#   pfqa heal
+#   pfqa generate report
+#   pfqa what tests are available
+#
+# Install as a global command:
+#   bash scripts/install-shell-commands.sh
+
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}"
+
+# Load local .env if present (allows ANTHROPIC_API_KEY to be set per-project)
+[[ -f ".env" ]] && set -a && source .env && set +a 2>/dev/null || true
+
+exec npx tsx scripts/run.ts "$@"
